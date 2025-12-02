@@ -25,7 +25,19 @@ def roots_20(coef: np.ndarray) -> tuple[np.ndarray, np.ndarray] | None:
             - Wektor miejsc zerowych (m,).
         Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
     """
-    pass
+    if not isinstance(coef,np.ndarray):
+        print("BŁĄD: To nie jest tablica numpy (isinstance zwróciło False)")
+        return None
+    if coef.size == 0:
+        print("BŁĄD: Tablica jest pusta (len == 0)")
+        return None
+    if coef.ndim != 1:
+        print(f"BŁĄD: Zła liczba wymiarów. Oczekiwano 1, otrzymano: {coef.ndim}")
+        print(f"INFO: Kształt tablicy to: {coef.shape}")
+        return None
+        
+    coef_zab = coef + (np.random.random_sample(len(coef)) * 1e-10)
+    return (np.array(coef_zab),np.array(nppoly.polyroots(coef_zab)))
 
 
 def frob_a(coef: np.ndarray) -> np.ndarray | None:
@@ -48,7 +60,22 @@ def frob_a(coef: np.ndarray) -> np.ndarray | None:
         (np.ndarray): Macierz Frobeniusa o rozmiarze (n,n).
         Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
     """
-    pass
+    if not isinstance(coef,np.ndarray):
+        return None
+    a_n = coef[-1]
+    
+    if a_n == 0:
+        return None
+    
+    n = coef.size - 1
+    matrix = np.zeros((n, n), dtype=float)
+    
+    for i in range(n - 1):
+        matrix[i, i + 1] = 1.0
+
+    matrix[-1, :] = -coef[:-1] / a_n
+    return matrix
+
 
 
 def is_nonsingular(A: np.ndarray) -> bool | None:
@@ -63,4 +90,15 @@ def is_nonsingular(A: np.ndarray) -> bool | None:
             wypadku `False`.
         Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
     """
-    pass
+    if not isinstance(A, np.ndarray):
+        return None
+    
+    if A.ndim != 2 or A.shape[0] != A.shape[1] or A.size == 0:
+        return None
+
+    epsilon = np.finfo(float).eps
+  
+    det = np.linalg.det(A)
+
+    return np.abs(det) > epsilon
+
